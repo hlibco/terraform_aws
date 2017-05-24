@@ -15,7 +15,7 @@ variable "key_name" {
 }
 
 variable "public_key" {
-  description = "TLocal path to the AWS public key .pub"
+  description = "Local path to the AWS public key .pub"
 }
 
 variable "environment" {

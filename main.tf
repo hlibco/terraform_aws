@@ -1,6 +1,6 @@
 ## Set Terraform version constraint
 terraform {
-  required_version = "> 0.8.0"
+  required_version = ">= 0.9.5"
 }
 
 /**
@@ -17,6 +17,26 @@ module "vpc" {
 }
 
 /**
+ * DHCP
+ ------------------------------------------------ */
+module "dhcp" {
+  source      = "./dhcp"
+  name        = "${var.domain_name}"
+  vpc_id      = "${module.vpc.id}"
+  domain_name = "${var.domain_name}"
+  servers     = "${coalesce(var.domain_name_servers, cidrhost(var.cidr, 2))}"
+}
+
+/**
+ * DNS
+ ------------------------------------------------ */
+# module "dns" {
+#   source = "./dns"
+#   name   = "${var.domain_name}"
+#   vpc_id = "${module.vpc.id}"
+# }
+
+/**
  * SECURITY GROUPS
  ------------------------------------------------ */
 module "security_groups" {
@@ -30,42 +50,40 @@ module "security_groups" {
 }
 
 /**
- * DNS
+ * IAM
  ------------------------------------------------ */
-module "dns" {
-  source = "./dns"
-  name   = "${var.domain_name}"
-  vpc_id = "${module.vpc.id}"
+module "iam" {
+  source          = "./iam"
+  environment     = "${var.environment}"
+  private_key     = "${file(var.iam_private_key)}"
+  certificate_body = "${file(var.iam_certificate_body)}"
 }
 
 /**
- * DHCP
+ * ELB
  ------------------------------------------------ */
-module "dhcp" {
-  source      = "./dhcp"
-  name        = "${module.dns.name}"
-  vpc_id      = "${module.vpc.id}"
-  domain_name = "${var.domain_name}"
-  servers     = "${coalesce(var.domain_name_servers, cidrhost(var.cidr, 2))}"
+module "elb" {
+  source            = "./elb"
+  subnets           = ["${module.vpc.external_subnets}"]
+  security_groups   = ["${module.security_groups.external_elb}"]
+  ssl_certificate_id = "${module.iam.server_certificate}"
 }
 
-# module "iam_role" {
-#   source      = "./iam-role"
-#   name        = "${var.name}"
-#   environment = "${var.environment}"
-# }
-
 /**
- * DNS
+ * EC2
  ------------------------------------------------ */
 module "ec2" {
-  source = "./ec2"
-  # name   = "${var.domain_name}"
-  instance_type      = "${var.aws_instance_type}"
-  image_id           = "${lookup(var.aws_amis, var.aws_region)}"
-  capacity           = "${var.capacity}"
-  availability_zones = "${var.aws_availability_zones}"
-  key_name           = "${var.aws_key_name}"
-  private_key        = "${file(var.aws_private_key)}"
-  server_port        = 8080
+  source              = "./ec2"
+  instance_type       = "${var.aws_instance_type}"
+  image_id            = "${lookup(var.aws_amis, var.aws_region)}"
+  iam_instance_profile = "${module.iam.instance_profile}"
+  security_groups     = ["${module.security_groups.external_elb}", "${module.security_groups.external_ssh}"]
+  capacity            = "${var.capacity}"
+  volume_size         = 12
+  availability_zones  = "${var.aws_availability_zones}"
+  vpc_zone_identifier  = ["${module.vpc.external_subnets}"]
+  key_name            = "${var.aws_key_name}"
+  private_key         = "${file(var.aws_private_key)}"
+  server_port         = 8080
+  load_balancers      = ["${module.elb.external_elb}"]
 }

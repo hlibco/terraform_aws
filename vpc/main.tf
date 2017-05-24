@@ -34,7 +34,7 @@ resource "aws_internet_gateway" "main" {
   availability_zone       = "${element(var.availability_zones, count.index)}"
   count                   = "${length(var.external_subnets_cidr)}"
   map_public_ip_on_launch = true
-  assign_ipv6_address_on_creation = true
+  # assign_ipv6_address_on_creation = true
 
   tags {
     Name        = "${var.name}-${format("external-%03d", count.index+1)}"

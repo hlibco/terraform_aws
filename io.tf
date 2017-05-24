@@ -43,7 +43,7 @@ variable "aws_private_key" {
 # Shared Credentials file
 variable "shared_credentials_file" {
   description = "Local path to the AWS credentials (access_key and secret_key)",
-  default     = "~/.aws/config"
+  default     = "~/.aws/credentials"
 }
 variable "profile" {
   description = "Profile used in the aws credentials file",
@@ -51,11 +51,24 @@ variable "profile" {
 }
 
 /**
+ * Certificate
+ ------------------------------------------------ */
+variable "iam_private_key" {
+  description = "Local path to the server private key",
+  default     = "/etc/ssl/certs/server.key"
+}
+variable "iam_certificate_body" {
+  description = "Local path to the server .crt file",
+  default     = "/etc/ssl/certs/server.crt"
+}
+
+
+/**
  * Region / Availability Zones / Instance Type
  ------------------------------------------------ */
 variable "aws_region" {
   description = "AWS region to launch EC2 servers for the VPC"
-  default     = "us-west-1"
+  default     = "us-west-2"
 }
 
 variable "aws_availability_zones" {
@@ -70,21 +83,9 @@ variable "aws_instance_type" {
 
 variable "aws_amis" {
   default = {
-    us-west-1 = "ami-f1810f86" # Ubuntu 14.04 LTS
+    us-west-2 = "ami-efd0428f" # Ubuntu 16.04 LTS
   }
 }
-
-/**
- * Auto scaling
- ------------------------------------------------ */
-variable "capacity" {
-  default = {
-    min     = 1
-    max     = 1
-    desired = 1
-  }
-}
-
 
 /**
  * VPC
@@ -96,12 +97,23 @@ variable "cidr" {
 
 variable "internal_subnets_cidr" {
   description = "CIDR for the Private Subnet. Must be set if the cidr variable is defined, needs to have as many elements as there are availability zones."
-  default     = ["10.1.0.0/19" ,"10.1.64.0/19", "10.1.128.0/19"]
+  default     = ["10.0.1.0/24" ,"10.0.64.0/24", "10.0.128.0/24"]
 }
 
 variable "external_subnets_cidr" {
   description = "CIDR for the Public Subnet. Must be set if the cidr variable is defined, needs to have as many elements as there are availability zones."
-  default     = ["10.1.32.0/20", "10.1.96.0/20", "10.1.160.0/20"]
+  default     = ["10.0.32.0/24", "10.0.96.0/24", "10.0.160.0/24"]
+}
+
+/**
+ * Auto scaling
+ ------------------------------------------------ */
+variable "capacity" {
+  default = {
+    min     = 1
+    max     = 1
+    desired = 1
+  }
 }
 
 
