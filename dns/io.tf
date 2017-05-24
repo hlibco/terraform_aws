@@ -8,7 +8,7 @@ variable "vpc_id" {
 }
 
 /**
- * Outputs
+ * OUTPUT
  ------------------------------------------------ */
 // The domain name.
 output "name" {

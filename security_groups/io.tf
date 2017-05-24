@@ -23,7 +23,7 @@ variable "environment" {
 }
 
 /**
- * Outputs
+ * OUTPUT
  ------------------------------------------------ */
 // External SSH allows ssh connections on port 22 from the world.
 output "external_ssh" {

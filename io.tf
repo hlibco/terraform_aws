@@ -11,6 +11,27 @@ variable "environment" {
 /**
  * DNS
  ------------------------------------------------ */
+variable "domain" {
+  description = "The external DNS name"
+  default     = "playground.com"
+}
+
+/**
+ * DHCP
+ ------------------------------------------------ */
+variable "ntp_servers" {
+  description = ""
+  default     = ["127.0.0.1"]
+}
+variable "netbios_node_type" {
+  description = ""
+  default     = 2
+}
+variable "netbios_name_servers" {
+  description = ""
+  default     = ["127.0.0.1"]
+}
+
 variable "domain_name" {
   description = "The internal DNS name to use with services"
   default     = "playground.local"
@@ -115,6 +136,7 @@ variable "capacity" {
     desired = 1
   }
 }
+
 
 
 /**

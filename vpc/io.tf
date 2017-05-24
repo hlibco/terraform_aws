@@ -27,7 +27,7 @@ variable "availability_zones" {
 }
 
 /**
- * Outputs
+ * OUTPUT
  ------------------------------------------------ */
 // The VPC ID
 output "id" {

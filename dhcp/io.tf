@@ -10,6 +10,10 @@ variable "domain_name" {
   description = "The internal DNS name to use with services"
 }
 
-variable "servers" {
+variable "domain_name_servers" {
   description = "A comma separated list of the IP addresses of internal DHCP servers"
 }
+
+variable "ntp_servers" { type = "list" }
+variable "netbios_node_type" {}
+variable "netbios_name_servers" { type = "list" }

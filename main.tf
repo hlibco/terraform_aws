@@ -8,12 +8,12 @@ terraform {
  ------------------------------------------------ */
 module "vpc" {
   source                = "./vpc"
+  environment           = "${var.environment}"
   name                  = "${var.name}"
   cidr                  = "${var.cidr}"
   internal_subnets_cidr = "${var.internal_subnets_cidr}"
   external_subnets_cidr = "${var.external_subnets_cidr}"
   availability_zones    = "${var.aws_availability_zones}"
-  environment           = "${var.environment}"
 }
 
 /**
@@ -24,29 +24,32 @@ module "dhcp" {
   name        = "${var.domain_name}"
   vpc_id      = "${module.vpc.id}"
   domain_name = "${var.domain_name}"
-  servers     = "${coalesce(var.domain_name_servers, cidrhost(var.cidr, 2))}"
+  domain_name_servers  = "${coalesce(var.domain_name_servers, cidrhost(var.cidr, 2))}"
+  ntp_servers          = "${var.ntp_servers}"
+  netbios_node_type    = "${var.netbios_node_type}"
+  netbios_name_servers = "${var.netbios_name_servers}"
 }
 
 /**
  * DNS
  ------------------------------------------------ */
-# module "dns" {
-#   source = "./dns"
-#   name   = "${var.domain_name}"
-#   vpc_id = "${module.vpc.id}"
-# }
+module "dns" {
+  source = "./dns"
+  name   = "${var.domain}"
+  vpc_id = "${module.vpc.id}"
+}
 
 /**
  * SECURITY GROUPS
  ------------------------------------------------ */
 module "security_groups" {
   source      = "./security_groups"
+  environment = "${var.environment}"
   name        = "${var.name}"
   vpc_id      = "${module.vpc.id}"
   cidr        = "${var.cidr}"
   key_name    = "${var.aws_key_name}"
   public_key  = "${var.aws_public_key}"
-  environment = "${var.environment}"
 }
 
 /**

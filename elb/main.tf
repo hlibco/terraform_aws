@@ -1,5 +1,5 @@
 resource "aws_elb" "external" {
-  name                        = "heavy"
+  name                        = "external"
   subnets                     = ["${var.subnets}"]
   security_groups             = ["${var.security_groups}"]
   cross_zone_load_balancing   = true
@@ -20,7 +20,6 @@ resource "aws_elb" "external" {
     lb_port            = 443
     lb_protocol        = "https"
     ssl_certificate_id  = "${var.ssl_certificate_id}"
-    # ssl_certificate_id  = "${terraform_remote_state.shared.output.iam_server_certificate_arn}"
   }
 
   health_check {

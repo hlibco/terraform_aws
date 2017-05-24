@@ -65,6 +65,21 @@ To destroy the resources created.
 `terraform destroy`
 
 ---
+
+### Shortcuts
+
+Add the following snipet to your `~/.ssh/config` and change the hostname.
+```
+Host dev
+ User ubuntu
+ HostName 123.456.789.123
+ StrictHostKeyChecking no
+ PasswordAuthentication no
+ IdentityFile ~/.aws/terraform
+ ServerAliveInterval 60
+```
+
+---
 ### Reference
 https://www.terraform.io/docs/providers/aws/index.html
 

@@ -1,14 +1,25 @@
 /**
+ * Placement Group
+ ------------------------------------------------ */
+resource "aws_placement_group" "worker" {
+  name     = "workers"
+  strategy = "cluster"
+}
+
+/**
  * Launch Configuration
  ------------------------------------------------ */
 resource "aws_launch_configuration" "worker" {
-  name            = "worker"
+  # Do not use a name in an aws_launch_configuration when
+  # you are trying to use an aws_autoscaling_group
+  # https://terraform.io/docs/providers/aws/r/launch_configuration.html
+  name_prefix      = "worker-"
+
   image_id        = "${var.image_id}"
   instance_type   = "${var.instance_type}"
 
   # The name of our SSH keypair you've created and downloaded
   # from the AWS console.
-  #
   # https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#KeyPairs:
   key_name        = "${var.key_name}"
 
@@ -35,7 +46,7 @@ resource "aws_launch_configuration" "worker" {
   # communicate with the resource (instance)
   # connection {
   #   type        = "ssh"
-  #   user        = "ec2-user" # ec2-user / ubuntu
+  #   user        = "ubuntu" # ec2-user / ubuntu
   #   agent       = true
   #   timeout     = "2m"
   #   private_key = "${var.private_key}"
@@ -50,14 +61,6 @@ resource "aws_launch_configuration" "worker" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-/**
- * Placement Group
- ------------------------------------------------ */
-resource "aws_placement_group" "worker" {
-  name     = "workers"
-  strategy = "cluster"
 }
 
 /**
@@ -84,7 +87,7 @@ resource "aws_autoscaling_group" "worker" {
   load_balancers            = ["${var.load_balancers}"]
 
   # It does not work with instance type t2.micro
-  # placement_group           = "${aws_placement_group.default.id}"
+  # placement_group         = "${aws_placement_group.worker.id}"
 
   lifecycle {
     create_before_destroy = true
